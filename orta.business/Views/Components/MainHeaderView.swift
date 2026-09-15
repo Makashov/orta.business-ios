@@ -20,6 +20,15 @@ struct MainHeaderView: View {
     }
 }
 
+extension View {
+    func mainHeader() -> some View {
+        frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                MainHeaderView()
+            }
+    }
+}
+
 #Preview {
     MainHeaderView()
 }

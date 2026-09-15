@@ -5,13 +5,10 @@ struct OrdersListView: View {
     var body: some View {
         Text("Hello, world!")
             .padding()
+            .mainHeader()
     }
 }
 
 #Preview {
     OrdersListView()
-}
-
-#Playground {
-    _ = 1 + 2
 }
