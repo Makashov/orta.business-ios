@@ -7,16 +7,42 @@
 
 import SwiftUI
 
+struct StatusColor {
+    let fill: Color
+    let ink: Color
+    let surface: Color
+}
+
 enum RecentOrderStatus {
     case created, inProgress, readyForPickup, completed, cancelled
 
-    var color: Color {
+    var color: StatusColor {
         switch self {
-        case .created: .orange
-        case .inProgress: .blue
-        case .readyForPickup: .teal
-        case .completed: .green
-        case .cancelled: .gray
+            case .created: StatusColor(
+                fill: Color("Amber"),
+                ink: Color("AmberInk"),
+                surface: Color("AmberSurface")
+            )
+            case .inProgress: StatusColor(
+                fill: Color("AccentColor"),
+                ink: Color("AccentInk"),
+                surface: Color("AccentBg")
+            )
+            case .readyForPickup: StatusColor(
+                fill: Color("Teal"),
+                ink: Color("TealInk"),
+                surface: Color("TealSurface")
+            )
+            case .completed: StatusColor(
+                fill: Color("Green"),
+                ink: Color("GreenInk"),
+                surface: Color("GreenSurface")
+            )
+            case .cancelled: StatusColor(
+                fill: Color("Slate"),
+                ink: Color("SlateInk"),
+                surface: Color("SlateSurface")
+            )
         }
     }
 
@@ -91,7 +117,7 @@ private struct RecentOrderRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(order.status.color)
+                .fill(order.status.color.fill)
                 .frame(width: 3)
                 .frame(maxHeight: .infinity)
 
@@ -103,11 +129,11 @@ private struct RecentOrderRowView: View {
 
                     Text(order.status.label)
                         .font(.system(size: 10.5, weight: .semibold))
-                        .foregroundStyle(order.status.color)
+                        .foregroundStyle(order.status.color.ink)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 2)
                         .background(
-                            Capsule().fill(order.status.color.opacity(0.15))
+                            Capsule().fill(order.status.color.surface)
                         )
                 }
 
