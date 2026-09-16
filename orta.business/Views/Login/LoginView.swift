@@ -40,6 +40,7 @@ struct LoginView: View {
                 .frame(minHeight: proxy.size.height)
             }
         }
+        .appBackground()
     }
 
     private var brandHeader: some View {

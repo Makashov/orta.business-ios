@@ -29,12 +29,12 @@ enum RecentOrderStatus {
                 surface: Color("AccentBg")
             )
             case .readyForPickup: StatusColor(
-                fill: Color("Teal"),
+                fill: Color("TealBase"),
                 ink: Color("TealInk"),
                 surface: Color("TealSurface")
             )
             case .completed: StatusColor(
-                fill: Color("Green"),
+                fill: Color("GreenBase"),
                 ink: Color("GreenInk"),
                 surface: Color("GreenSurface")
             )

@@ -24,7 +24,7 @@ struct OrderSummaryFooterView: View {
             .buttonStyle(.borderedProminent)
         }
         .padding()
-        .background(.background)
+        .background(Color("Bg"))
     }
 }
 
