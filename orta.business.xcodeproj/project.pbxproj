@@ -6,8 +6,16 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6E34E929305AC19000657A48 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E34E928305AC19000657A48 /* Debug.xcconfig */; };
+		6E34E92B305AC8E300657A48 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E34E92A305AC8E300657A48 /* Release.xcconfig */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* orta.business.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = orta.business.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E34E928305AC19000657A48 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		6E34E92A305AC8E300657A48 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		6E34E92E305AD4F200657A48 /* orta-business-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "orta-business-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -30,7 +38,10 @@
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
+				6E34E92E305AD4F200657A48 /* orta-business-Info.plist */,
 				000000000000000000000010 /* orta.business */,
+				6E34E928305AC19000657A48 /* Debug.xcconfig */,
+				6E34E92A305AC8E300657A48 /* Release.xcconfig */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -104,6 +115,8 @@
 		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				6E34E92B305AC8E300657A48 /* Release.xcconfig in Resources */,
+				6E34E929305AC19000657A48 /* Debug.xcconfig in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -119,6 +132,7 @@
 /* Begin XCBuildConfiguration section */
 		000000000000000011000000 /* Debug configuration for PBXProject "orta.business" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6E34E928305AC19000657A48 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -189,6 +203,7 @@
 		};
 		000000000000000012000000 /* Release configuration for PBXProject "orta.business" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6E34E92A305AC8E300657A48 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -240,6 +255,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PROJECT_UNIQUE_VALUE = KVLJB1OJ;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -259,6 +275,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "orta-business-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -298,6 +316,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "orta-business-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct LoginView: View {
+    @Environment(AuthViewModel.self) private var authViewModel
+
     @State private var companyCode = ""
     @State private var username = ""
     @State private var password = ""
-
-    /// Layout-only for now — wired up once authentication is implemented.
-    var onSignIn: (_ companyCode: String, _ username: String, _ password: String) -> Void = { _, _, _ in }
 
     private var canSubmit: Bool {
         !companyCode.trimmingCharacters(in: .whitespaces).isEmpty
             && !username.trimmingCharacters(in: .whitespaces).isEmpty
             && !password.isEmpty
+            && !authViewModel.isSigningIn
     }
 
     var body: some View {
@@ -31,6 +31,15 @@ struct LoginView: View {
                         LoginFieldView(icon: "building.2", label: "Company code", text: $companyCode)
                         LoginFieldView(icon: "person", label: "Username", text: $username)
                         LoginFieldView(icon: "lock", label: "Password", text: $password, isSecure: true)
+                    }
+                    .disabled(authViewModel.isSigningIn)
+
+                    if let errorMessage = authViewModel.errorMessage {
+                        Text(verbatim: errorMessage)
+                            .font(.system(size: 12.5, weight: .medium))
+                            .foregroundStyle(.red)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
                     }
 
                     signInButton
@@ -66,17 +75,25 @@ struct LoginView: View {
 
     private var signInButton: some View {
         Button {
-            onSignIn(companyCode, username, password)
+            Task { await authViewModel.signIn(companyCode: companyCode, username: username, password: password) }
         } label: {
-            Text("Sign In")
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.brandAccent)
-                )
+            ZStack {
+                Text("Sign In")
+                    .opacity(authViewModel.isSigningIn ? 0 : 1)
+
+                if authViewModel.isSigningIn {
+                    ProgressView()
+                        .tint(.white)
+                }
+            }
+            .font(.system(size: 15, weight: .bold))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.brandAccent)
+            )
         }
         .buttonStyle(.plain)
         .opacity(canSubmit ? 1 : 0.5)
@@ -142,10 +159,12 @@ private struct LoginFieldView: View {
 
 #Preview("Light Mode") {
     LoginView()
+        .environment(AuthViewModel())
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark Mode") {
     LoginView()
+        .environment(AuthViewModel())
         .preferredColorScheme(.dark)
 }
