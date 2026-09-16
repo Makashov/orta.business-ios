@@ -9,11 +9,26 @@ import SwiftUI
 
 struct HomeView: View {
     var body: some View {
-        Text("Home")
-            .mainHeader()
+        ScrollView {
+            VStack(spacing: 20) {
+                TodayStatsCardView()
+                QuickActionsGridView()
+                RecentOrdersSectionView()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            .padding(.bottom, 108)
+        }
+        .mainHeader()
     }
 }
 
-#Preview {
+#Preview("Light Mode") {
     HomeView()
+        .preferredColorScheme(.light)
+}
+
+#Preview("Dark Mode") {
+    HomeView()
+        .preferredColorScheme(.dark)
 }

@@ -84,6 +84,12 @@ struct BottomNavViewView: View {
     }
 }
 
-#Preview {
+#Preview("Light Mode") {
     BottomNavViewView()
+        .preferredColorScheme(.light)
+}
+
+#Preview("Dark Mode") {
+    BottomNavViewView()
+        .preferredColorScheme(.dark)
 }
