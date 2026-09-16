@@ -10,7 +10,11 @@ import SwiftUI
 struct OrderCreateView: View {
     var body: some View {
         Text("Create Order View")
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .toolbar(.hidden, for: .tabBar)
+            .safeAreaInset(edge: .bottom) {
+                OrderSummaryFooterView(total: 0)
+            }
     }
 }
 

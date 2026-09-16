@@ -18,7 +18,7 @@ struct BottomNavViewView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack(path: $homePath) {
-                OrdersListView()
+                HomeView()
                     .navigationDestination(for: CreateRoute.self) { _ in
                         OrderCreateView()
                     }
