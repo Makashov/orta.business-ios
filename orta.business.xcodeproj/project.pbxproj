@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		6E34E929305AC19000657A48 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E34E928305AC19000657A48 /* Debug.xcconfig */; };
 		6E34E92B305AC8E300657A48 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E34E92A305AC8E300657A48 /* Release.xcconfig */; };
+		6E4823DC305AE9660037ECB1 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6E4823DB305AE9600037ECB1 /* .gitignore */; };
+		6E4823DE305AE9900037ECB1 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E4823DD305AE98E0037ECB1 /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +18,8 @@
 		6E34E928305AC19000657A48 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		6E34E92A305AC8E300657A48 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		6E34E92E305AD4F200657A48 /* orta-business-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "orta-business-Info.plist"; sourceTree = "<group>"; };
+		6E4823DB305AE9600037ECB1 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		6E4823DD305AE98E0037ECB1 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,6 +42,8 @@
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
+				6E4823DD305AE98E0037ECB1 /* Secrets.xcconfig */,
+				6E4823DB305AE9600037ECB1 /* .gitignore */,
 				6E34E92E305AD4F200657A48 /* orta-business-Info.plist */,
 				000000000000000000000010 /* orta.business */,
 				6E34E928305AC19000657A48 /* Debug.xcconfig */,
@@ -115,6 +121,8 @@
 		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				6E4823DC305AE9660037ECB1 /* .gitignore in Resources */,
+				6E4823DE305AE9900037ECB1 /* Secrets.xcconfig in Resources */,
 				6E34E92B305AC8E300657A48 /* Release.xcconfig in Resources */,
 				6E34E929305AC19000657A48 /* Debug.xcconfig in Resources */,
 			);

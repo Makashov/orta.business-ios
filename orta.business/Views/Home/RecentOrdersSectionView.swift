@@ -19,7 +19,7 @@ enum RecentOrderStatus {
     var color: StatusColor {
         switch self {
             case .created: StatusColor(
-                fill: Color("Amber"),
+                fill: Color("AmberBase"),
                 ink: Color("AmberInk"),
                 surface: Color("AmberSurface")
             )
@@ -39,7 +39,7 @@ enum RecentOrderStatus {
                 surface: Color("GreenSurface")
             )
             case .cancelled: StatusColor(
-                fill: Color("Slate"),
+                fill: Color("SlateBase"),
                 ink: Color("SlateInk"),
                 surface: Color("SlateSurface")
             )

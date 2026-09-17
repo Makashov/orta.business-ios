@@ -57,7 +57,7 @@ struct BottomNavViewView: View {
             .tag(AppTab.statistics)
 
             NavigationStack(path: $menuPath) {
-                OrdersListView()
+                MenuView()
                     .navigationDestination(for: CreateRoute.self) { _ in
                         OrderCreateView()
                     }

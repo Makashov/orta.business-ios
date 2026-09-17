@@ -1,0 +1,44 @@
+## Xcode Build Outputs
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Xcode User Settings & State
+xcuserdata/
+*.xcuserstate
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+## macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Swift Package Manager (SPM)
+.build/
+.swiftpm/
+
+## CocoaPods (Optional)
+# Uncomment the next line if you do not want to commit your third-party source code
+# Pods/
+
+## Carthage (Optional)
+Carthage/Checkouts/
+Carthage/Build/
+
+## Fastlane (Optional)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+./Secrets.xcconfig

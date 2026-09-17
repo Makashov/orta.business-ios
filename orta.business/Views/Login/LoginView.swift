@@ -37,7 +37,7 @@ struct LoginView: View {
                     if let errorMessage = authViewModel.errorMessage {
                         Text(verbatim: errorMessage)
                             .font(.system(size: 12.5, weight: .medium))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color("DangerInk"))
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
                     }
@@ -55,21 +55,21 @@ struct LoginView: View {
     private var brandHeader: some View {
         VStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color.brandAccent.opacity(0.15))
+                .fill(Color("AccentBg"))
                 .frame(width: 64, height: 64)
                 .overlay(
                     Image(systemName: "briefcase.fill")
                         .font(.system(size: 26, weight: .medium))
-                        .foregroundStyle(Color.brandAccent)
+                        .foregroundStyle(Color("AccentColor"))
                 )
 
             Text(verbatim: "Orta Business")
                 .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color("Ink"))
 
             Text("Sign in to your account")
                 .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color("Ink2"))
         }
     }
 
@@ -86,13 +86,13 @@ struct LoginView: View {
                         .tint(.white)
                 }
             }
-            .font(.system(size: 15, weight: .bold))
-            .foregroundStyle(.white)
+            .font(.system(size: 18, weight: .bold))
+            .foregroundStyle(Color("AccentLabel"))
             .frame(maxWidth: .infinity)
             .frame(height: 50)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.brandAccent)
+                    .fill(Color("AccentColor"))
             )
         }
         .buttonStyle(.plain)
@@ -114,12 +114,12 @@ private struct LoginFieldView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color("Ink2"))
 
             HStack(spacing: 10) {
                 Image(systemName: icon)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(Color("Chev"))
                     .frame(width: 18)
 
                 Group {
@@ -138,7 +138,7 @@ private struct LoginFieldView: View {
                     } label: {
                         Image(systemName: isRevealed ? "eye.slash" : "eye")
                             .font(.system(size: 14))
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(Color("Chev"))
                     }
                     .buttonStyle(.plain)
                 }
@@ -147,11 +147,11 @@ private struct LoginFieldView: View {
             .frame(height: 48)
             .background(
                 RoundedRectangle(cornerRadius: 13, style: .continuous)
-                    .fill(Color.primary.opacity(0.05))
+                    .fill(Color("Card"))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 13, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.1))
+                    .strokeBorder(Color("Line"))
             )
         }
     }
