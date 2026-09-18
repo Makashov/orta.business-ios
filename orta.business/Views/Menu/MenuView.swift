@@ -9,19 +9,31 @@ import SwiftUI
 
 struct MenuView: View {
     @Environment(AuthViewModel.self) private var authViewModel
+    @State private var isConfirmingLogout = false
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
+            ProfileBlockView()
+
+            MenuListSectionView()
+
             Spacer()
 
             LogoutButtonView {
-                authViewModel.signOut()
+                isConfirmingLogout = true
             }
-
-            Spacer()
+            .padding(.horizontal, 20)
+            .padding(.bottom, 16)
         }
-        .padding(.horizontal, 20)
         .appBackground()
+        .alert(
+            "Are you sure you want to log out?",
+            isPresented: $isConfirmingLogout) {
+                Button("Log out", role: .destructive) {
+                    authViewModel.signOut()
+                }
+                Button("Cancel", role: .cancel) {}
+            }
     }
 }
 

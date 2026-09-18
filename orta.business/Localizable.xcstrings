@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "21 active" : {
       "localizations" : {
         "en" : {
@@ -22,6 +25,12 @@
           }
         }
       }
+    },
+    "Are you sure you want to log out?" : {
+
+    },
+    "Cancel" : {
+
     },
     "Cancelled" : {
       "localizations" : {
@@ -202,6 +211,9 @@
         }
       }
     },
+    "Dark theme" : {
+
+    },
     "Deliveries" : {
       "localizations" : {
         "en" : {
@@ -269,6 +281,9 @@
       }
     },
     "Hello, world!" : {
+
+    },
+    "Help & Support" : {
 
     },
     "Home" : {
@@ -406,6 +421,12 @@
         }
       }
     },
+    "Off" : {
+
+    },
+    "On" : {
+
+    },
     "Orders" : {
       "localizations" : {
         "en" : {
@@ -427,6 +448,12 @@
           }
         }
       }
+    },
+    "Organization" : {
+
+    },
+    "Owner" : {
+
     },
     "Password" : {
       "localizations" : {
@@ -471,6 +498,9 @@
           }
         }
       }
+    },
+    "Profile & Security" : {
+
     },
     "Ready for pickup" : {
       "localizations" : {
