@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MenuListSectionView: View {
-    @State private var isDarkModeOn = false
+    @AppStorage("isDarkModeOn") private var isDarkModeOn = false
 
     var organizationName: String = "Tazabek"
     var organizationCity: String = "Almaty"

@@ -2,6 +2,7 @@ import SwiftUI
 
 @main struct OrtaBusinessApp: App {
     @State private var authViewModel = AuthViewModel()
+    @AppStorage("isDarkModeOn") private var isDarkModeOn = false
 
     var body: some Scene {
         WindowGroup {
@@ -13,6 +14,7 @@ import SwiftUI
                 }
             }
             .environment(authViewModel)
+            .preferredColorScheme(isDarkModeOn ? .dark : .light)
         }
     }
 }
