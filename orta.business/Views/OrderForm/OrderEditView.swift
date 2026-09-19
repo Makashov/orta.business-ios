@@ -68,13 +68,16 @@ struct OrderEditView: View {
                     }
                 )
 
+                OrderStatusCardView(status: $status)
+
                 OrderAdditionalDetailsCardView(
                     status: $status,
                     customerName: $customerName,
                     scheduledAt: $scheduledAt,
                     delivery: $delivery,
                     discount: $discount,
-                    comment: $comment
+                    comment: $comment,
+                    showsStatus: false
                 )
             }
             .padding(.horizontal, 16)

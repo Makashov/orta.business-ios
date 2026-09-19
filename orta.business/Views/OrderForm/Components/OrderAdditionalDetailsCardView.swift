@@ -14,8 +14,13 @@ struct OrderAdditionalDetailsCardView: View {
     @Binding var delivery: String
     @Binding var discount: Int
     @Binding var comment: String
+    var showsStatus: Bool = true
 
     @State private var isExpanded = false
+
+    private var subtitle: String {
+        showsStatus ? "Статус, имя, даты, скидка, комментарий" : "Имя, даты, скидка, комментарий"
+    }
 
     private var discountText: Binding<String> {
         Binding(
@@ -36,7 +41,7 @@ struct OrderAdditionalDetailsCardView: View {
                         Text("Дополнительно")
                             .font(.system(size: 13.5, weight: .bold))
                             .foregroundStyle(.primary)
-                        Text("Статус, имя, даты, скидка, комментарий")
+                        Text(subtitle)
                             .font(.system(size: 11.5, weight: .medium))
                             .foregroundStyle(.tertiary)
                     }
@@ -58,9 +63,11 @@ struct OrderAdditionalDetailsCardView: View {
                     .padding(.horizontal, 16)
 
                 VStack(spacing: 0) {
-                    statusRow
+                    if showsStatus {
+                        statusRow
 
-                    Divider()
+                        Divider()
+                    }
 
                     OrderFormFieldRow(
                         icon: "person",
@@ -132,42 +139,10 @@ struct OrderAdditionalDetailsCardView: View {
                     .textCase(.uppercase)
                     .foregroundStyle(.tertiary)
 
-                FlowLayout(spacing: 7, lineSpacing: 7) {
-                    ForEach(OrderStatus.allCases, id: \.self) { candidate in
-                        statusPill(candidate)
-                    }
-                }
+                OrderStatusPickerView(status: $status)
             }
         }
         .padding(.vertical, 13)
-    }
-
-    private func statusPill(_ candidate: OrderStatus) -> some View {
-        let isActive = status == candidate
-        return Button {
-            status = candidate
-        } label: {
-            HStack(spacing: 6) {
-                Circle()
-                    .fill(candidate.color.fill)
-                    .frame(width: 7, height: 7)
-
-                Text(candidate.label)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.primary.opacity(0.85))
-            }
-            .padding(.horizontal, 11)
-            .padding(.vertical, 7)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isActive ? candidate.color.surface : Color("Card2"))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .strokeBorder(isActive ? candidate.color.fill : Color.clear, lineWidth: 1.5)
-            )
-        }
-        .buttonStyle(.plain)
     }
 }
 

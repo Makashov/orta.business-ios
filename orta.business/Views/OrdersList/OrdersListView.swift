@@ -9,6 +9,7 @@ struct OrdersListView: View {
     @State private var customTo: Date?
     @State private var isDateSheetPresented = false
     @State private var statusFilter: OrderStatusFilter = .all
+    @State private var selectedOrder: Order?
 
     private let calendar = Calendar.current
 
@@ -27,11 +28,16 @@ struct OrdersListView: View {
 
             List {
                 ForEach(filteredOrders) { order in
-                    OrderListItemView(order: order)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .orderSwipeActions(for: order, orders: $orders)
+                    Button {
+                        selectedOrder = order
+                    } label: {
+                        OrderListItemView(order: order)
+                    }
+                    .buttonStyle(.plain)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .orderSwipeActions(for: order, orders: $orders)
                 }
             }
             .listStyle(.plain)
@@ -48,6 +54,9 @@ struct OrdersListView: View {
             }
         }
         .appBackground()
+        .navigationDestination(item: $selectedOrder) { order in
+            OrderEditView(order: order)
+        }
         .sheet(isPresented: $isDateSheetPresented) {
             OrderDateFilterSheetView(
                 preset: $datePreset,

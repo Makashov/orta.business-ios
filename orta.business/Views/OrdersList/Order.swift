@@ -57,7 +57,7 @@ enum OrderStatus: String, CaseIterable {
     }
 }
 
-struct Order: Identifiable {
+struct Order: Identifiable, Hashable {
     let id: Int
     let sum: Int
     let date: Date

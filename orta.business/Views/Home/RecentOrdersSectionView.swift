@@ -13,6 +13,8 @@ struct RecentOrdersSectionView: View {
     var onSeeAll: () -> Void = {}
     var onSelect: (Order) -> Void = { _ in }
 
+    @State private var selectedOrder: Order?
+
     // OrderListItemView rows are single-line throughout, so their height is constant.
     // Sizing the embedded List from that lets it sit inside HomeView's own ScrollView
     // (a List won't size itself to fit its content otherwise).
@@ -37,6 +39,7 @@ struct RecentOrdersSectionView: View {
             List {
                 ForEach(orders) { order in
                     Button {
+                        selectedOrder = order
                         onSelect(order)
                     } label: {
                         OrderListItemView(order: order, currencySymbol: currencySymbol)
@@ -53,6 +56,9 @@ struct RecentOrdersSectionView: View {
             .scrollDisabled(true)
             .scrollContentBackground(.hidden)
             .frame(height: CGFloat(orders.count) * rowHeight + CGFloat(max(orders.count - 1, 0)) * rowSpacing)
+        }
+        .navigationDestination(item: $selectedOrder) { order in
+            OrderEditView(order: order)
         }
     }
 }
