@@ -12,6 +12,7 @@ struct OrdersListView: View {
     @State private var selectedOrder: Order?
 
     private let calendar = Calendar.current
+    private let ordersService: any OrdersServicing = LiveOrdersService()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -56,6 +57,9 @@ struct OrdersListView: View {
         .appBackground()
         .navigationDestination(item: $selectedOrder) { order in
             OrderEditView(order: order)
+        }
+        .onAppear {
+            Task { try? await ordersService.fetchOrders() }
         }
         .sheet(isPresented: $isDateSheetPresented) {
             OrderDateFilterSheetView(

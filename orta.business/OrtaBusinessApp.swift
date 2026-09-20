@@ -15,6 +15,9 @@ import SwiftUI
             }
             .environment(authViewModel)
             .preferredColorScheme(isDarkModeOn ? .dark : .light)
+            #if DEBUG
+            .pulseConsoleOnShake()
+            #endif
         }
     }
 }

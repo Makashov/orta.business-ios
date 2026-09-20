@@ -11,6 +11,8 @@
 		6E34E92B305AC8E300657A48 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E34E92A305AC8E300657A48 /* Release.xcconfig */; };
 		6E4823DC305AE9660037ECB1 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6E4823DB305AE9600037ECB1 /* .gitignore */; };
 		6E4823DE305AE9900037ECB1 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 6E4823DD305AE98E0037ECB1 /* Secrets.xcconfig */; };
+		BACACBEC2E5E157AECECC175 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4FB6A491A482731078475944 /* PulseUI */; };
+		EDBE78FCA01AAA15CBEA5AC7 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 75BECDB003374C47389AB85C /* Pulse */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				EDBE78FCA01AAA15CBEA5AC7 /* Pulse in Frameworks */,
+				BACACBEC2E5E157AECECC175 /* PulseUI in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -77,6 +81,10 @@
 				000000000000000000000010 /* orta.business */,
 			);
 			name = orta.business;
+			packageProductDependencies = (
+				75BECDB003374C47389AB85C /* Pulse */,
+				4FB6A491A482731078475944 /* PulseUI */,
+			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* orta.business.app */;
 			productType = "com.apple.product-type.application";
@@ -107,6 +115,9 @@
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FAE5F91F7151FB4252315DEC /* XCRemoteSwiftPackageReference "Pulse" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
@@ -375,6 +386,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FAE5F91F7151FB4252315DEC /* XCRemoteSwiftPackageReference "Pulse" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Pulse.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4FB6A491A482731078475944 /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FAE5F91F7151FB4252315DEC /* XCRemoteSwiftPackageReference "Pulse" */;
+			productName = PulseUI;
+		};
+		75BECDB003374C47389AB85C /* Pulse */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FAE5F91F7151FB4252315DEC /* XCRemoteSwiftPackageReference "Pulse" */;
+			productName = Pulse;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 000000000000000000000000 /* Project object */;
 }

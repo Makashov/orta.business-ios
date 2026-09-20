@@ -13,8 +13,21 @@ struct AuthSession: Codable, Equatable {
     let name: String
     let username: String
     let role: AuthRole
+    /// The tenant subdomain used to sign in. The login response doesn't include
+    /// it, so it's filled in locally — persisting it lets later API calls
+    /// rebuild the tenant-scoped base URL without asking the user again.
+    let companyCode: String
 
     var isValid: Bool { expiresAt > .now }
+
+    init(token: String, expiresAt: Date, name: String, username: String, role: AuthRole, companyCode: String) {
+        self.token = token
+        self.expiresAt = expiresAt
+        self.name = name
+        self.username = username
+        self.role = role
+        self.companyCode = companyCode
+    }
 
     private enum CodingKeys: String, CodingKey {
         case token
@@ -22,6 +35,19 @@ struct AuthSession: Codable, Equatable {
         case name
         case username
         case role
+        case companyCode
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        token = try container.decode(String.self, forKey: .token)
+        expiresAt = try container.decode(Date.self, forKey: .expiresAt)
+        name = try container.decode(String.self, forKey: .name)
+        username = try container.decode(String.self, forKey: .username)
+        role = try container.decode(AuthRole.self, forKey: .role)
+        // Absent from the server's login response; the keychain-persisted copy
+        // (written locally, see LiveAuthService) always has it.
+        companyCode = try container.decodeIfPresent(String.self, forKey: .companyCode) ?? ""
     }
 }
 
