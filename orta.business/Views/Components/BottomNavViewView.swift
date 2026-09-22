@@ -7,6 +7,8 @@ private enum AppTab: Hashable {
 private struct CreateRoute: Hashable {}
 
 struct BottomNavViewView: View {
+    @Environment(OrderStatusStore.self) private var orderStatusStore: OrderStatusStore?
+
     @State private var selectedTab: AppTab = .home
     @State private var previousTab: AppTab = .home
 
@@ -66,6 +68,9 @@ struct BottomNavViewView: View {
                 Label("Menu", systemImage: "list.bullet")
             }
             .tag(AppTab.menu)
+        }
+        .task {
+            await orderStatusStore?.load()
         }
         .onChange(of: selectedTab) { _, newValue in
             guard newValue == .create else {

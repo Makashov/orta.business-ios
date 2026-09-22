@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct RecentOrdersSectionView: View {
+    @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
+
     @State private var orders: [Order] = Array(Order.sample.prefix(5))
     var currencySymbol: String = "₸"
     var onSeeAll: () -> Void = {}
@@ -48,7 +50,7 @@ struct RecentOrdersSectionView: View {
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
-                    .orderSwipeActions(for: order, orders: $orders)
+                    .orderSwipeActions(for: order, orders: $orders, statuses: statusStore?.statuses ?? [])
                 }
             }
             .listStyle(.plain)

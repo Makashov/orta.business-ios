@@ -5,56 +5,30 @@
 //  Created by Nurbol Makashov on 19.09.2026.
 //
 
-import SwiftUI
+import Foundation
 
-struct StatusColor {
-    let fill: Color
-    let ink: Color
-    let surface: Color
-}
-
-enum OrderStatus: String, CaseIterable {
-    case new, work, ready, done, canceled
-
-    var label: String {
-        switch self {
-        case .new: "Создан"
-        case .work: "В работе"
-        case .ready: "Готов к выдаче"
-        case .done: "Завершён"
-        case .canceled: "Отменён"
-        }
+/// Raw `/api/orders` list item shape, decoded before being resolved into an `Order`
+/// (which needs the matching `OrderStatus` looked up by `status` id).
+struct OrderDTO: Decodable {
+    struct Client: Decodable {
+        let name: String
+        let phone: String
     }
 
-    var color: StatusColor {
-        switch self {
-        case .new: StatusColor(
-            fill: Color("AmberBase"),
-            ink: Color("AmberInk"),
-            surface: Color("AmberSurface")
-        )
-        case .work: StatusColor(
-            fill: Color("AccentColor"),
-            ink: Color("AccentInk"),
-            surface: Color("AccentBg")
-        )
-        case .ready: StatusColor(
-            fill: Color("TealBase"),
-            ink: Color("TealInk"),
-            surface: Color("TealSurface")
-        )
-        case .done: StatusColor(
-            fill: Color("GreenBase"),
-            ink: Color("GreenInk"),
-            surface: Color("GreenSurface")
-        )
-        case .canceled: StatusColor(
-            fill: Color("SlateBase"),
-            ink: Color("SlateInk"),
-            surface: Color("SlateSurface")
-        )
-        }
+    struct Address: Decodable {
+        let id: Int
+        let text: String
+        let placeId: String?
+        let lat: Double?
+        let lng: Double?
     }
+
+    let id: Int
+    let number: String
+    let status: Int
+    let client: Client
+    let address: Address
+    let total: Int
 }
 
 struct Order: Identifiable, Hashable {
@@ -65,9 +39,46 @@ struct Order: Identifiable, Hashable {
     let name: String
     let phone: String
     var status: OrderStatus
+    private let rawNumber: String
 
-    var number: String { "№ \(id)" }
+    var number: String { rawNumber.isEmpty ? "№ \(id)" : rawNumber }
     var displayName: String { name.isEmpty ? phone : name }
+
+    init(
+        id: Int,
+        sum: Int,
+        date: Date,
+        address: String,
+        name: String,
+        phone: String,
+        status: OrderStatus,
+        number: String = ""
+    ) {
+        self.id = id
+        self.sum = sum
+        self.date = date
+        self.address = address
+        self.name = name
+        self.phone = phone
+        self.status = status
+        self.rawNumber = number
+    }
+
+    /// - Parameter status: resolved from `dto.status` via `OrderStatusStore`; the
+    ///   list endpoint doesn't send a creation date, so `date` is a placeholder
+    ///   until the backend provides one.
+    init(dto: OrderDTO, status: OrderStatus) {
+        self.init(
+            id: dto.id,
+            sum: dto.total,
+            date: .now,
+            address: dto.address.text,
+            name: dto.client.name,
+            phone: dto.client.phone,
+            status: status,
+            number: dto.number
+        )
+    }
 
     static let sample: [Order] = {
         let calendar = Calendar.current

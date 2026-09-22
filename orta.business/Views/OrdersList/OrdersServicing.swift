@@ -9,22 +9,22 @@ import Foundation
 import Pulse
 
 protocol OrdersServicing {
-    /// Raw response body — kept undecoded since the server's `Order` JSON shape
-    /// isn't established yet; the list screen still runs on local sample data.
-    @discardableResult
-    func fetchOrders() async throws -> Data
+    func fetchOrders() async throws -> [OrderDTO]
+    func fetchStatuses() async throws -> [OrderStatus]
 }
 
 enum OrdersServiceError: LocalizedError {
     case notSignedIn
     case invalidURL
     case server(Int)
+    case decoding
 
     var errorDescription: String? {
         switch self {
         case .notSignedIn: "Not signed in."
         case .invalidURL: "Couldn't build the orders URL for the current session."
         case .server(let code): "Server returned \(code)."
+        case .decoding: "Couldn't read the server's response."
         }
     }
 }
@@ -45,8 +45,15 @@ struct LiveOrdersService: OrdersServicing {
         self.sessionStore = sessionStore
     }
 
-    @discardableResult
-    func fetchOrders() async throws -> Data {
+    func fetchOrders() async throws -> [OrderDTO] {
+        try await fetch([OrderDTO].self, path: "orders")
+    }
+
+    func fetchStatuses() async throws -> [OrderStatus] {
+        try await fetch([OrderStatus].self, path: "orders/statuses")
+    }
+
+    private func fetch<T: Decodable>(_ type: T.Type, path: String) async throws -> T {
         guard let authSession = sessionStore.loadSession() else {
             throw OrdersServiceError.notSignedIn
         }
@@ -54,7 +61,7 @@ struct LiveOrdersService: OrdersServicing {
             throw OrdersServiceError.invalidURL
         }
 
-        var request = URLRequest(url: baseURL.appendingPathComponent("orders"))
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "GET"
         request.setValue("Bearer \(authSession.token)", forHTTPHeaderField: "Authorization")
 
@@ -62,6 +69,18 @@ struct LiveOrdersService: OrdersServicing {
         if let httpResponse = response as? HTTPURLResponse, !(200..<300).contains(httpResponse.statusCode) {
             throw OrdersServiceError.server(httpResponse.statusCode)
         }
-        return data
+        do {
+            return try JSONDecoder.orders.decode(T.self, from: data)
+        } catch {
+            throw OrdersServiceError.decoding
+        }
     }
+}
+
+private extension JSONDecoder {
+    static let orders: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
 }

@@ -1,9 +1,12 @@
 import SwiftUI
 
 struct OrdersListView: View {
+    @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
+
     @State private var searchText = ""
     @State private var isSearching = false
-    @State private var orders: [Order] = Order.sample
+    @State private var orders: [Order] = []
+    @State private var loadError: String?
     @State private var datePreset: OrderDatePreset = .all
     @State private var customFrom: Date?
     @State private var customTo: Date?
@@ -38,7 +41,7 @@ struct OrdersListView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
-                    .orderSwipeActions(for: order, orders: $orders)
+                    .orderSwipeActions(for: order, orders: $orders, statuses: statusStore?.statuses ?? [])
                 }
             }
             .listStyle(.plain)
@@ -56,10 +59,11 @@ struct OrdersListView: View {
         }
         .appBackground()
         .navigationDestination(item: $selectedOrder) { order in
-            OrderEditView(order: order)
+            OrderDetailsView(order: order)
         }
-        .onAppear {
-            Task { try? await ordersService.fetchOrders() }
+        .task {
+            await statusStore?.load()
+            await loadOrders()
         }
         .sheet(isPresented: $isDateSheetPresented) {
             OrderDateFilterSheetView(
@@ -80,6 +84,20 @@ struct OrdersListView: View {
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
             .presentationCornerRadius(28)
+        }
+    }
+
+    // MARK: - Loading
+
+    private func loadOrders() async {
+        do {
+            let dtos = try await ordersService.fetchOrders()
+            orders = dtos.map { dto in
+                Order(dto: dto, status: statusStore?.status(id: dto.status) ?? .canceled)
+            }
+            loadError = nil
+        } catch {
+            loadError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 
@@ -143,7 +161,8 @@ struct OrdersListView: View {
     }
 
     private var emptyStateText: String {
-        activeQuery.isEmpty
+        if let loadError { return loadError }
+        return activeQuery.isEmpty
             ? "Заказов в этой категории нет"
             : "Ничего не найдено — проверьте номер или телефон"
     }

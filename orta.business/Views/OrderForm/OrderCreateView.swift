@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OrderCreateView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
 
     @State private var phone = ""
     @State private var address = ""
@@ -82,6 +83,11 @@ struct OrderCreateView: View {
                 items[index] = item
             } else {
                 items.append(item)
+            }
+        }
+        .task {
+            if let initial = statusStore?.initialStatus {
+                status = initial
             }
         }
     }

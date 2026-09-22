@@ -11,10 +11,16 @@ import SwiftUI
 /// (edit form) and the status row inside "Дополнительно" (create form).
 struct OrderStatusPickerView: View {
     @Binding var status: OrderStatus
+    @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
+
+    private var statuses: [OrderStatus] {
+        let loaded = statusStore?.statuses ?? []
+        return loaded.isEmpty ? OrderStatus.samples : loaded
+    }
 
     var body: some View {
         FlowLayout(spacing: 7, lineSpacing: 7) {
-            ForEach(OrderStatus.allCases, id: \.self) { candidate in
+            ForEach(statuses) { candidate in
                 pill(candidate)
             }
         }

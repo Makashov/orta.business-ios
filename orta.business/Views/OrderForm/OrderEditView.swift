@@ -10,6 +10,7 @@ import SwiftUI
 struct OrderEditView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AuthViewModel.self) private var authViewModel: AuthViewModel?
+    @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
 
     let order: Order
 
@@ -54,7 +55,7 @@ struct OrderEditView: View {
     private var payable: Int { max(items.reduce(0) { $0 + $1.total } - discount, 0) }
     private var paid: Int { payments.reduce(0) { $0 + $1.amount } }
     private var remaining: Int { max(payable - paid, 0) }
-    private var canFinish: Bool { status != .done && status != .canceled }
+    private var canFinish: Bool { !status.isTerminal }
     private var authorName: String { authViewModel?.session?.name ?? "" }
 
     private var isFormValid: Bool {
@@ -131,7 +132,7 @@ struct OrderEditView: View {
                     if let method, remaining > 0 {
                         payments.append(OrderPayment(amount: remaining, method: method, author: authorName))
                     }
-                    status = .done
+                    status = statusStore?.completedStatus ?? .done
                 }
             }
         }

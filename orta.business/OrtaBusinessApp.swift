@@ -2,6 +2,7 @@ import SwiftUI
 
 @main struct OrtaBusinessApp: App {
     @State private var authViewModel = AuthViewModel()
+    @State private var orderStatusStore = OrderStatusStore()
     @AppStorage("isDarkModeOn") private var isDarkModeOn = false
 
     var body: some Scene {
@@ -14,6 +15,7 @@ import SwiftUI
                 }
             }
             .environment(authViewModel)
+            .environment(orderStatusStore)
             .preferredColorScheme(isDarkModeOn ? .dark : .light)
             #if DEBUG
             .pulseConsoleOnShake()

@@ -24,9 +24,9 @@ enum OrderStatusFilter: String, CaseIterable, Identifiable {
     func matches(_ status: OrderStatus) -> Bool {
         switch self {
         case .all: true
-        case .active: status == .new || status == .work || status == .ready
-        case .done: status == .done
-        case .canceled: status == .canceled
+        case .active: !status.isTerminal
+        case .done: status.isTerminal && !status.isCancelled
+        case .canceled: status.isTerminal && status.isCancelled
         }
     }
 }

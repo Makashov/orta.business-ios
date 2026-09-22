@@ -10,20 +10,23 @@ import SwiftUI
 extension View {
     /// Trailing cancel/processing + leading WhatsApp swipe actions shared by every
     /// order row (List rows only). `orders` is mutated in place so the caller's
-    /// filtering/derived state recomputes automatically.
-    func orderSwipeActions(for order: Order, orders: Binding<[Order]>) -> some View {
+    /// filtering/derived state recomputes automatically. `statuses` is the tenant's
+    /// real status list, used to resolve the target of each action.
+    func orderSwipeActions(for order: Order, orders: Binding<[Order]>, statuses: [OrderStatus]) -> some View {
         self
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                Button {
-                    setStatus(order, to: .canceled, in: orders)
-                } label: {
-                    Label("Cancel", systemImage: "xmark")
-                }
-                .tint(Color("SlateBase"))
-
-                if order.status == .new {
+                if let cancelled = statuses.first(where: { $0.isCancelled }) {
                     Button {
-                        setStatus(order, to: .work, in: orders)
+                        setStatus(order, to: cancelled, in: orders)
+                    } label: {
+                        Label("Cancel", systemImage: "xmark")
+                    }
+                    .tint(Color("SlateBase"))
+                }
+
+                if order.status.isInitial, let inProgress = statuses.first(where: { !$0.isInitial && !$0.isTerminal }) {
+                    Button {
+                        setStatus(order, to: inProgress, in: orders)
                     } label: {
                         Label("Processing", systemImage: "checkmark")
                     }
