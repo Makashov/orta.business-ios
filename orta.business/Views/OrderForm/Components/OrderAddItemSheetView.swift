@@ -20,7 +20,6 @@ struct OrderAddItemSheetView: View {
 
     @State private var step: Step
     @State private var searchText = ""
-    @State private var selectedCategory = "Все"
     @State private var activeCatalogItem: CatalogItem?
 
     @State private var isCustom: Bool
@@ -35,7 +34,8 @@ struct OrderAddItemSheetView: View {
         self.existingItem = existingItem
         self.onSave = onSave
         _step = State(initialValue: existingItem == nil ? .catalog : .configure)
-        _isCustom = State(initialValue: existingItem?.category == nil)
+        _isCustom = State(initialValue: existingItem?.catalogItemId == nil)
+        _activeCatalogItem = State(initialValue: catalogItems.first { $0.id == existingItem?.catalogItemId })
         _name = State(initialValue: existingItem?.name ?? "")
         _quantity = State(initialValue: existingItem?.quantity ?? 1)
         _unitPrice = State(initialValue: existingItem?.unitPrice ?? 0)
@@ -55,12 +55,9 @@ struct OrderAddItemSheetView: View {
     // MARK: - Step 1: catalog
 
     private var filteredCatalogItems: [CatalogItem] {
-        catalogItems.filter { item in
-            let matchesCategory = selectedCategory == "Все" || item.category == selectedCategory
-            let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-            let matchesQuery = query.isEmpty || item.name.localizedCaseInsensitiveContains(query)
-            return matchesCategory && matchesQuery
-        }
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return catalogItems }
+        return catalogItems.filter { $0.name.localizedCaseInsensitiveContains(query) }
     }
 
     private var catalogStep: some View {
@@ -108,14 +105,6 @@ struct OrderAddItemSheetView: View {
                     RoundedRectangle(cornerRadius: 13, style: .continuous)
                         .strokeBorder(Color("Line"))
                 )
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 7) {
-                        ForEach(CatalogItem.categories, id: \.self) { category in
-                            categoryChip(category)
-                        }
-                    }
-                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 4)
@@ -143,28 +132,6 @@ struct OrderAddItemSheetView: View {
         }
     }
 
-    private func categoryChip(_ category: String) -> some View {
-        let isActive = selectedCategory == category
-        return Button {
-            selectedCategory = category
-        } label: {
-            Text(category)
-                .font(.system(size: 12.5, weight: .semibold))
-                .foregroundStyle(isActive ? Color("AccentLabel") : Color.primary.opacity(0.85))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
-                .background(
-                    RoundedRectangle(cornerRadius: 11, style: .continuous)
-                        .fill(isActive ? Color.brandAccent : Color("Card"))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 11, style: .continuous)
-                        .strokeBorder(isActive ? Color.clear : Color("Line"))
-                )
-        }
-        .buttonStyle(.plain)
-    }
-
     private func catalogItemRow(_ item: CatalogItem) -> some View {
         Button {
             selectCatalogItem(item)
@@ -174,7 +141,7 @@ struct OrderAddItemSheetView: View {
                     Text(item.name)
                         .font(.system(size: 13.5, weight: .bold))
                         .foregroundStyle(.primary)
-                    Text(verbatim: "\(item.unitPrice.formatted()) ₸ / \(item.unit)")
+                    Text(item.unitPrice.map { "\($0.formatted()) ₸ / \(item.unitCode)" } ?? "Цена согласуется / \(item.unitCode)")
                         .font(.system(size: 11.5, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
@@ -199,8 +166,8 @@ struct OrderAddItemSheetView: View {
         activeCatalogItem = item
         isCustom = false
         name = item.name
-        unitPrice = item.unitPrice
-        unit = item.unit
+        unitPrice = item.unitPrice ?? 0
+        unit = item.unitCode
         quantity = 1
         comment = ""
         step = .configure
@@ -209,10 +176,9 @@ struct OrderAddItemSheetView: View {
     // MARK: - Step 2: configure
 
     private var configureSubtitle: String? {
-        if let activeCatalogItem {
-            return "\(activeCatalogItem.category) · базовая цена \(activeCatalogItem.unitPrice.formatted()) ₸"
-        }
-        return existingItem?.category
+        guard let activeCatalogItem else { return nil }
+        guard let basePrice = activeCatalogItem.unitPrice else { return "Базовая цена согласуется" }
+        return "Базовая цена \(basePrice.formatted()) ₸"
     }
 
     private var configureStep: some View {
@@ -382,13 +348,17 @@ struct OrderAddItemSheetView: View {
     }
 
     private func save() {
+        // Custom items have no catalog default to compare against, and a catalog
+        // item whose base price the user changed both count as "manually agreed".
+        let priceAgreed = isCustom || activeCatalogItem?.unitPrice == nil || activeCatalogItem?.unitPrice != unitPrice
         let item = OrderLineItem(
             id: existingItem?.id ?? UUID(),
+            catalogItemId: isCustom ? nil : (activeCatalogItem?.id ?? existingItem?.catalogItemId),
             name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-            category: isCustom ? nil : (activeCatalogItem?.category ?? existingItem?.category),
             quantity: quantity,
             unitPrice: unitPrice,
             unit: unit,
+            priceAgreed: priceAgreed,
             comment: comment
         )
         onSave(item)
@@ -421,6 +391,6 @@ extension View {
 #Preview("Configure") {
     OrderAddItemSheetView(
         catalogItems: CatalogItem.sample,
-        existingItem: OrderLineItem(name: "Химчистка дивана", category: "Химчистка", quantity: 1, unitPrice: 12_000, unit: "шт", comment: "3-местный")
+        existingItem: OrderLineItem(name: "Химчистка дивана", quantity: 1, unitPrice: 12_000, unit: "шт", comment: "3-местный")
     ) { _ in }
 }

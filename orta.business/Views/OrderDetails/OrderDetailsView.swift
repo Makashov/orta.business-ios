@@ -7,54 +7,63 @@
 
 import SwiftUI
 
-/// Layout-only order details screen. Content is static placeholder data until it is wired to the backend.
+/// Order details screen. Shows the list's `Order` immediately, then fills in the rest
+/// from `GET /api/orders/:id`.
 struct OrderDetailsView: View {
     let order: Order
 
+    @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
+
+    @State private var details: OrderDetails?
+    @State private var loadError: String?
     @State private var isMoreSheetPresented = false
+    @State private var isEditPresented = false
 
-    private let items = [
-        OrderLineItem(name: "Химчистка дивана", quantity: 1, unitPrice: 12_000, unit: "шт", comment: "3-местный"),
-        OrderLineItem(name: "Чистка ковра", quantity: 8, unitPrice: 1_200, unit: "м²"),
-    ]
+    private let ordersService: any OrdersServicing = LiveOrdersService()
 
-    private let infoRows = [
-        OrderDetailsInfoRow(title: "Дата создания", value: "4 сентября 2026, 13:05"),
-        OrderDetailsInfoRow(title: "Дата выполнения", value: "6 сентября, 14:00–17:00"),
-        OrderDetailsInfoRow(title: "Оператор", value: "Асель Н."),
-        OrderDetailsInfoRow(title: "Источник", value: "WhatsApp"),
-        OrderDetailsInfoRow(title: "Комментарий", value: "Позвонить за час до выезда, дома кошка"),
-    ]
-
-    private let history = [
-        OrderDetailsHistoryEvent(title: "Оплата 10 000 ₸ · Kaspi QR", subtitle: "4 сент, 13:20 · Асель Н.", color: Color("GreenBase")),
-        OrderDetailsHistoryEvent(title: "Статус изменён на «В работе»", subtitle: "4 сент, 13:12 · Асель Н.", color: Color("AccentColor")),
-        OrderDetailsHistoryEvent(title: "Заказ создан", subtitle: "4 сент, 13:05 · Асель Н.", color: Color("AmberBase")),
-    ]
+    private var current: Order { details?.order ?? order }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
+                if let loadError {
+                    Text(loadError)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color("DangerInk"))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
                 OrderDetailsSummaryCardView(
-                    status: order.status,
-                    createdLabel: "Создан 4 сент, 13:05",
-                    total: 21_600,
-                    paid: 10_000
+                    status: current.status,
+                    createdLabel: details?.createdAt.map { "Создан \(Self.shortDateTime($0))" } ?? "",
+                    total: current.sum,
+                    paid: details?.paid ?? 0
                 )
 
                 OrderDetailsCustomerCardView(
-                    name: order.displayName,
-                    subtitle: "7 заказов · с марта 2025",
-                    phone: order.phone
+                    name: current.displayName,
+                    subtitle: details?.clientOrderCount.map { "Заказов: \($0)" },
+                    phone: current.phone
                 )
 
-                OrderDetailsAddressCardView(address: order.address, note: "Подъезд 2, код 1244, 5 этаж")
+                OrderDetailsAddressCardView(address: current.address)
 
-                OrderDetailsPositionsCardView(items: items)
+                if let details {
+                    if !details.items.isEmpty {
+                        OrderDetailsPositionsCardView(items: details.items)
+                    }
 
-                OrderDetailsInfoCardView(rows: infoRows)
+                    if !infoRows(for: details).isEmpty {
+                        OrderDetailsInfoCardView(rows: infoRows(for: details))
+                    }
 
-                OrderDetailsHistoryCardView(events: history)
+                    if !history(for: details).isEmpty {
+                        OrderDetailsHistoryCardView(events: history(for: details))
+                    }
+                } else if loadError == nil {
+                    ProgressView()
+                        .padding(.top, 12)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 12)
@@ -66,14 +75,9 @@ struct OrderDetailsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                VStack(spacing: 1) {
-                    Text(verbatim: "Заказ \(order.number)")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.primary)
-                    Text(verbatim: "2026-00417")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.tertiary)
-                }
+                Text(verbatim: "Заказ \(current.number)")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.primary)
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -87,11 +91,90 @@ struct OrderDetailsView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            OrderDetailsActionBarView()
+            OrderDetailsActionBarView(onEdit: { isEditPresented = true })
+        }
+        .navigationDestination(isPresented: $isEditPresented) {
+            OrderEditView(order: current)
         }
         .sheet(isPresented: $isMoreSheetPresented) {
             OrderDetailsMoreSheetView()
         }
+        .task {
+            await loadDetails()
+        }
+        .refreshable {
+            await loadDetails()
+        }
+    }
+
+    // MARK: - Loading
+
+    private func loadDetails() async {
+        do {
+            let dto = try await ordersService.fetchOrder(id: order.id)
+            await statusStore?.load()
+            details = OrderDetails(dto: dto, status: statusStore?.status(id: dto.status) ?? order.status)
+            loadError = nil
+        } catch {
+            loadError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
+    }
+
+    // MARK: - Content
+
+    private func infoRows(for details: OrderDetails) -> [OrderDetailsInfoRow] {
+        var rows: [OrderDetailsInfoRow] = []
+        if let createdAt = details.createdAt {
+            rows.append(OrderDetailsInfoRow(title: "Дата создания", value: Self.longDateTime(createdAt)))
+        }
+        if let scheduledAt = details.order.scheduledAt {
+            rows.append(OrderDetailsInfoRow(title: "Дата выполнения", value: Self.longDateTime(scheduledAt)))
+        }
+        if let deliveryAt = details.deliveryAt {
+            rows.append(OrderDetailsInfoRow(title: "Дата доставки", value: Self.longDateTime(deliveryAt)))
+        }
+        if details.discount > 0 {
+            rows.append(OrderDetailsInfoRow(title: "Скидка", value: "\(details.discount.formatted()) ₸"))
+        }
+        if !details.comment.isEmpty {
+            rows.append(OrderDetailsInfoRow(title: "Комментарий", value: details.comment))
+        }
+        return rows
+    }
+
+    /// Newest first: payments, then order creation.
+    private func history(for details: OrderDetails) -> [OrderDetailsHistoryEvent] {
+        let payments = details.payments
+            .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
+            .map { payment in
+                OrderDetailsHistoryEvent(
+                    title: ["Оплата \(payment.amount.formatted()) ₸", payment.method?.label]
+                        .compactMap { $0 }
+                        .joined(separator: " · "),
+                    subtitle: payment.date.map(Self.shortDateTime) ?? "",
+                    color: Color("GreenBase")
+                )
+            }
+        let created = details.createdAt.map {
+            OrderDetailsHistoryEvent(title: "Заказ создан", subtitle: Self.shortDateTime($0), color: Color("AmberBase"))
+        }
+        return payments + [created].compactMap { $0 }
+    }
+
+    /// "4 сент, 13:05"
+    private static func shortDateTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "d MMM, HH:mm"
+        return formatter.string(from: date).replacingOccurrences(of: ".", with: "")
+    }
+
+    /// "4 сентября 2026, 13:05"
+    private static func longDateTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "d MMMM yyyy, HH:mm"
+        return formatter.string(from: date)
     }
 }
 

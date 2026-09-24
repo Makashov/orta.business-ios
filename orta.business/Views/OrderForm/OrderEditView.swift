@@ -21,13 +21,16 @@ struct OrderEditView: View {
     @State private var items: [OrderLineItem]
     @State private var isAddItemSheetPresented = false
     @State private var editingItem: OrderLineItem?
+    @State private var catalogItems: [CatalogItem] = []
 
     @State private var status: OrderStatus
     @State private var customerName: String
-    @State private var scheduledAt = ""
-    @State private var delivery = ""
+    @State private var scheduledAt: Date?
+    @State private var delivery: Date?
     @State private var discount = 0
     @State private var comment = ""
+
+    private let catalogService: any CatalogServicing = LiveCatalogService()
 
     @State private var payments: [OrderPayment] = []
     @State private var removedPayments: [OrderPayment] = []
@@ -62,11 +65,12 @@ struct OrderEditView: View {
         !phone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private var createdLabel: String {
+    private var scheduledLabel: String {
+        guard let scheduledAt = order.scheduledAt else { return "Дата не назначена" }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "d MMMM, HH:mm"
-        return "Создан \(formatter.string(from: order.date))"
+        return "Запланировано \(formatter.string(from: scheduledAt))"
     }
 
     var body: some View {
@@ -146,7 +150,7 @@ struct OrderEditView: View {
                     Text(order.number)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.primary)
-                    Text(createdLabel)
+                    Text(scheduledLabel)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.tertiary)
                 }
@@ -168,7 +172,7 @@ struct OrderEditView: View {
         }
         .orderAddItemSheet(
             isPresented: $isAddItemSheetPresented,
-            catalogItems: CatalogItem.sample,
+            catalogItems: catalogItems,
             editingItem: editingItem
         ) { item in
             if let index = items.firstIndex(where: { $0.id == item.id }) {
@@ -176,6 +180,9 @@ struct OrderEditView: View {
             } else {
                 items.append(item)
             }
+        }
+        .task {
+            catalogItems = (try? await catalogService.fetchCatalogItems()) ?? []
         }
     }
 }

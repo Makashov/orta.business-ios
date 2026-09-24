@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct OrderCreateView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
 
     @State private var phone = ""
@@ -18,13 +17,21 @@ struct OrderCreateView: View {
     @State private var items: [OrderLineItem] = []
     @State private var isAddItemSheetPresented = false
     @State private var editingItem: OrderLineItem?
+    @State private var catalogItems: [CatalogItem] = []
 
     @State private var status: OrderStatus = .new
     @State private var customerName = ""
-    @State private var scheduledAt = ""
-    @State private var delivery = ""
+    @State private var scheduledAt: Date?
+    @State private var delivery: Date?
     @State private var discount = 0
     @State private var comment = ""
+
+    @State private var isSubmitting = false
+    @State private var submitError: String?
+    @State private var createdOrder: Order?
+
+    private let ordersService: any OrdersServicing = LiveOrdersService()
+    private let catalogService: any CatalogServicing = LiveCatalogService()
 
     private var total: Int { items.reduce(0) { $0 + $1.total } }
 
@@ -70,13 +77,17 @@ struct OrderCreateView: View {
         .navigationTitle("Новый заказ")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
-            OrderSummaryFooterView(total: total, isSubmitEnabled: isFormValid) {
-                dismiss()
+            OrderSummaryFooterView(
+                total: total,
+                isSubmitEnabled: isFormValid && !isSubmitting,
+                submitLabel: isSubmitting ? "Создание…" : "Создать заказ"
+            ) {
+                Task { await submit() }
             }
         }
         .orderAddItemSheet(
             isPresented: $isAddItemSheetPresented,
-            catalogItems: CatalogItem.sample,
+            catalogItems: catalogItems,
             editingItem: editingItem
         ) { item in
             if let index = items.firstIndex(where: { $0.id == item.id }) {
@@ -89,6 +100,39 @@ struct OrderCreateView: View {
             if let initial = statusStore?.initialStatus {
                 status = initial
             }
+            catalogItems = (try? await catalogService.fetchCatalogItems()) ?? []
+        }
+        .alert(
+            "Не удалось создать заказ",
+            isPresented: Binding(get: { submitError != nil }, set: { if !$0 { submitError = nil } })
+        ) {
+            Button("ОК", role: .cancel) {}
+        } message: {
+            Text(submitError ?? "")
+        }
+        .navigationDestination(item: $createdOrder) { order in
+            OrderDetailsView(order: order)
+        }
+    }
+
+    private func submit() async {
+        isSubmitting = true
+        defer { isSubmitting = false }
+        do {
+            let dto = try await ordersService.createOrder(
+                number: orderNumber.trimmingCharacters(in: .whitespacesAndNewlines),
+                clientName: customerName.trimmingCharacters(in: .whitespacesAndNewlines),
+                clientPhone: phone.trimmingCharacters(in: .whitespacesAndNewlines),
+                addressText: address.trimmingCharacters(in: .whitespacesAndNewlines),
+                scheduledAt: scheduledAt,
+                deliveryAt: delivery,
+                discount: discount,
+                comment: comment,
+                items: items
+            )
+            createdOrder = Order(dto: dto, status: statusStore?.status(id: dto.status) ?? status)
+        } catch {
+            submitError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 }

@@ -12,6 +12,20 @@ enum PaymentMethod: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// Server-side payment method id. Hardcoded until the methods are fetched from the API.
+    var serverId: Int {
+        switch self {
+        case .kaspiQR: 1
+        case .kaspiTransfer: 2
+        case .cash: 3
+        }
+    }
+
+    init?(serverId: Int) {
+        guard let method = Self.allCases.first(where: { $0.serverId == serverId }) else { return nil }
+        self = method
+    }
+
     var label: String {
         switch self {
         case .kaspiQR: "Kaspi QR"

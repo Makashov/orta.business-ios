@@ -7,20 +7,18 @@
 
 import Foundation
 
+/// A `/api/catalog` item, resolved from `CatalogItemDTO`. `unitPrice` is `nil`
+/// when the catalog entry has no fixed price and must be agreed per order.
 struct CatalogItem: Identifiable, Hashable {
-    let id = UUID()
+    let id: Int
     let name: String
-    let category: String
-    let unitPrice: Int
-    let unit: String
-
-    static let categories = ["Все", "Химчистка", "Ковры", "Мебель", "Шторы"]
+    let unitCode: String
+    let unitPrice: Int?
 
     static let sample: [CatalogItem] = [
-        CatalogItem(name: "Химчистка дивана", category: "Химчистка", unitPrice: 12_000, unit: "шт"),
-        CatalogItem(name: "Чистка ковра", category: "Ковры", unitPrice: 1_200, unit: "м²"),
-        CatalogItem(name: "Химчистка кресла", category: "Химчистка", unitPrice: 5_000, unit: "шт"),
-        CatalogItem(name: "Чистка матраса", category: "Химчистка", unitPrice: 9_000, unit: "шт"),
-        CatalogItem(name: "Стирка шторы", category: "Шторы", unitPrice: 2_500, unit: "м²"),
+        CatalogItem(id: 4, name: "Химчистка дивана", unitCode: "шт", unitPrice: nil),
+        CatalogItem(id: 1, name: "Чистка ковра — синтетика", unitCode: "м²", unitPrice: 800),
+        CatalogItem(id: 3, name: "Чистка ковра — шёлк", unitCode: "м²", unitPrice: 900),
+        CatalogItem(id: 2, name: "Чистка ковра — шерсть", unitCode: "м²", unitPrice: 900),
     ]
 }

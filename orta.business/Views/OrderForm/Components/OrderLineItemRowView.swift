@@ -69,8 +69,8 @@ struct OrderLineItemRowView: View {
 
 #Preview {
     VStack(spacing: 8) {
-        OrderLineItemRowView(item: OrderLineItem(name: "Химчистка дивана", category: "Химчистка", quantity: 1, unitPrice: 12_000, unit: "шт", comment: "3-местный"))
-        OrderLineItemRowView(item: OrderLineItem(name: "Чистка ковра", category: "Ковры", quantity: 8, unitPrice: 1_200, unit: "м²"))
+        OrderLineItemRowView(item: OrderLineItem(name: "Химчистка дивана", quantity: 1, unitPrice: 12_000, unit: "шт", comment: "3-местный"))
+        OrderLineItemRowView(item: OrderLineItem(name: "Чистка ковра", quantity: 8, unitPrice: 1_200, unit: "м²"))
     }
     .padding()
     .appBackground()

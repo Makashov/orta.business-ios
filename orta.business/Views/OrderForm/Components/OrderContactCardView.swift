@@ -12,6 +12,25 @@ struct OrderContactCardView: View {
     @Binding var address: String
     @Binding var orderNumber: String
 
+    /// Keeps `phone` always starting with "+7" (and never shorter than it), and
+    /// normalizes pasted numbers that start with "8" or a bare "7" into that form.
+    private var formattedPhone: Binding<String> {
+        Binding(
+            get: { phone },
+            set: { phone = Self.normalizedPhone(old: phone, new: $0) }
+        )
+    }
+
+    private static func normalizedPhone(old: String, new: String) -> String {
+        if new.hasPrefix("+7") { return new }
+        // A lone "+" means the "7" of "+7" was just deleted — restore the prefix.
+        if new == "+" { return old.hasPrefix("+7") ? "+7" : new }
+        if new.isEmpty { return old.isEmpty ? "" : "+7" }
+        if new.hasPrefix("8") { return "+7" + new.dropFirst() }
+        if new.hasPrefix("7") { return "+" + new }
+        return "+7" + new
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             OrderFormFieldRow(
@@ -20,7 +39,7 @@ struct OrderContactCardView: View {
                 title: "Телефон",
                 isRequired: true,
                 placeholder: "+7 ___ ___ __ __",
-                text: $phone,
+                text: formattedPhone,
                 valueFont: .system(size: 17, weight: .semibold),
                 keyboardType: .phonePad,
                 textContentType: .telephoneNumber

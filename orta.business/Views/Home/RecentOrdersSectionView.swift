@@ -10,17 +10,19 @@ import SwiftUI
 struct RecentOrdersSectionView: View {
     @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
 
-    @State private var orders: [Order] = Array(Order.sample.prefix(5))
+    @State private var orders: [Order] = []
     var currencySymbol: String = "₸"
     var onSeeAll: () -> Void = {}
     var onSelect: (Order) -> Void = { _ in }
 
     @State private var selectedOrder: Order?
 
+    private let ordersService: any OrdersServicing = LiveOrdersService()
+
     // OrderListItemView rows are single-line throughout, so their height is constant.
     // Sizing the embedded List from that lets it sit inside HomeView's own ScrollView
     // (a List won't size itself to fit its content otherwise).
-    private let rowHeight: CGFloat = 78
+    private let rowHeight: CGFloat = 93
     private let rowSpacing: CGFloat = 8
 
     var body: some View {
@@ -61,6 +63,23 @@ struct RecentOrdersSectionView: View {
         }
         .navigationDestination(item: $selectedOrder) { order in
             OrderEditView(order: order)
+        }
+        .task {
+            await statusStore?.load()
+            await loadOrders()
+        }
+    }
+
+    private func loadOrders() async {
+        guard let dtos = try? await ordersService.fetchOrders(
+            query: nil,
+            from: nil,
+            till: nil,
+            statusIDs: nil,
+            limit: 5
+        ) else { return }
+        orders = dtos.map { dto in
+            Order(dto: dto, status: statusStore?.status(id: dto.status) ?? .canceled)
         }
     }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OrderDetailsCustomerCardView: View {
     let name: String
-    let subtitle: String
+    var subtitle: String?
     let phone: String
     var onCall: () -> Void = {}
     var onWhatsApp: () -> Void = {}
@@ -31,9 +31,11 @@ struct OrderDetailsCustomerCardView: View {
                     VStack(alignment: .leading, spacing: 1) {
                         Text(name)
                             .font(.system(size: 15, weight: .bold))
-                        Text(subtitle)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.tertiary)
+                        if let subtitle {
+                            Text(subtitle)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.tertiary)
+                        }
                     }
                 }
 

@@ -10,8 +10,8 @@ import SwiftUI
 struct OrderAdditionalDetailsCardView: View {
     @Binding var status: OrderStatus
     @Binding var customerName: String
-    @Binding var scheduledAt: String
-    @Binding var delivery: String
+    @Binding var scheduledAt: Date?
+    @Binding var delivery: Date?
     @Binding var discount: Int
     @Binding var comment: String
     var showsStatus: Bool = true
@@ -78,20 +78,20 @@ struct OrderAdditionalDetailsCardView: View {
 
                     Divider()
 
-                    OrderFormFieldRow(
+                    OrderDateFieldRow(
                         icon: "calendar",
                         title: "Дата и время",
                         placeholder: "Не назначена",
-                        text: $scheduledAt
+                        date: $scheduledAt
                     )
 
                     Divider()
 
-                    OrderFormFieldRow(
+                    OrderDateFieldRow(
                         icon: "shippingbox",
                         title: "Доставка",
                         placeholder: "Не назначена",
-                        text: $delivery
+                        date: $delivery
                     )
 
                     Divider()
@@ -150,8 +150,8 @@ struct OrderAdditionalDetailsCardView: View {
     OrderAdditionalDetailsCardView(
         status: .constant(.new),
         customerName: .constant(""),
-        scheduledAt: .constant(""),
-        delivery: .constant(""),
+        scheduledAt: .constant(nil),
+        delivery: .constant(nil),
         discount: .constant(0),
         comment: .constant("")
     )
@@ -164,8 +164,8 @@ struct OrderAdditionalDetailsCardView: View {
     OrderAdditionalDetailsCardView(
         status: .constant(.work),
         customerName: .constant("Дмитрий Ким"),
-        scheduledAt: .constant(""),
-        delivery: .constant(""),
+        scheduledAt: .constant(nil),
+        delivery: .constant(nil),
         discount: .constant(1000),
         comment: .constant("")
     )

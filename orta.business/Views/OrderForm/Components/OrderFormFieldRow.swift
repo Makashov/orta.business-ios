@@ -19,6 +19,8 @@ struct OrderFormFieldRow: View {
     var textContentType: UITextContentType?
     var isMultiline: Bool = false
 
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         HStack(alignment: isMultiline ? .top : .center, spacing: 12) {
             Image(systemName: icon)
@@ -26,6 +28,8 @@ struct OrderFormFieldRow: View {
                 .foregroundStyle(iconColor)
                 .frame(width: 18)
                 .padding(.top, isMultiline ? 2 : 0)
+                .contentShape(Rectangle())
+                .onTapGesture { isFocused = true }
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 2) {
@@ -41,18 +45,22 @@ struct OrderFormFieldRow: View {
                             .foregroundStyle(Color("DangerBase"))
                     }
                 }
+                .contentShape(Rectangle())
+                .onTapGesture { isFocused = true }
 
                 if isMultiline {
                     TextField(placeholder, text: $text, axis: .vertical)
                         .font(valueFont)
                         .foregroundStyle(.primary)
                         .lineLimit(2...4)
+                        .focused($isFocused)
                 } else {
                     TextField(placeholder, text: $text)
                         .font(valueFont)
                         .foregroundStyle(.primary)
                         .keyboardType(keyboardType)
                         .textContentType(textContentType)
+                        .focused($isFocused)
                 }
             }
         }
