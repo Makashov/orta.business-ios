@@ -9,10 +9,16 @@ import SwiftUI
 
 struct TodayStatsCardView: View {
     var date: Date = .now
-    var revenue: Int = 184_500
     var currencySymbol: String = "₸"
-    var newOrdersCount: Int = 12
-    var closedOrdersCount: Int = 9
+
+    @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
+
+    @State private var revenue: Int = 0
+    @State private var newOrdersCount: Int = 0
+    @State private var closedOrdersCount: Int = 0
+
+    private let ordersService: any OrdersServicing = LiveOrdersService()
+    private let statsService: any StatsServicing = LiveStatsService()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -49,6 +55,26 @@ struct TodayStatsCardView: View {
         .padding(EdgeInsets(top: 16, leading: 16, bottom: 14, trailing: 16))
         .cardSurface(cornerRadius: 18)
         .shadow(color: .black.opacity(0.06), radius: 12, y: 4)
+        .task {
+            await loadStats()
+        }
+    }
+
+    private func loadStats() async {
+        await statusStore?.load()
+
+        async let revenueResult = statsService.fetchRevenue(from: date, till: date)
+        async let countsResult = ordersService.fetchOrderCounts(query: nil, from: date, till: date)
+
+        if let value = try? await revenueResult {
+            revenue = value
+        }
+        if let counts = try? await countsResult, let statuses = statusStore?.statuses {
+            newOrdersCount = statuses.filter(\.isInitial).reduce(0) { $0 + (counts[$1.name] ?? 0) }
+            closedOrdersCount = statuses
+                .filter { $0.isTerminal && !$0.isCancelled }
+                .reduce(0) { $0 + (counts[$1.name] ?? 0) }
+        }
     }
 }
 

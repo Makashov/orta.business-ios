@@ -22,4 +22,9 @@ enum ContactLinks {
         guard !digits.isEmpty else { return nil }
         return URL(string: "https://wa.me/\(digits)")
     }
+
+    /// 2GIS' geo link takes longitude first, then latitude.
+    static func twoGIS(lat: Double, lng: Double) -> URL? {
+        URL(string: "https://2gis.kz/geo/\(lng),\(lat)")
+    }
 }

@@ -48,7 +48,9 @@ struct OrderDetailsView: View {
                     onWhatsApp: { openWhatsApp(current.phone) }
                 )
 
-                OrderDetailsAddressCardView(address: current.address)
+                if let lat = details?.lat, let lng = details?.lng {
+                    OrderDetailsAddressCardView(address: current.address, lat: lat, lng: lng)
+                }
 
                 if let details {
                     if !details.items.isEmpty {
@@ -73,14 +75,17 @@ struct OrderDetailsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .appBackground()
+#if os(iOS)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarTitleDisplayMode(.inline)
+#endif
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(verbatim: "Заказ \(current.number)")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(.primary)
             }
+#if os(iOS)
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isEditPresented = true
@@ -91,6 +96,7 @@ struct OrderDetailsView: View {
                 }
                 .accessibilityLabel("Редактировать")
             }
+#endif
         }
         .safeAreaInset(edge: .bottom) {
             OrderDetailsActionBarView(onEdit: { isEditPresented = true })
@@ -173,7 +179,7 @@ struct OrderDetailsView: View {
     }
 
     /// "4 сент, 13:05"
-    private static func shortDateTime(_ date: Date) -> String {
+    nonisolated private static func shortDateTime(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "d MMM, HH:mm"

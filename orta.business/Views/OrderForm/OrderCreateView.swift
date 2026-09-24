@@ -73,9 +73,11 @@ struct OrderCreateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .appBackground()
-        .toolbar(.hidden, for: .tabBar)
         .navigationTitle("Новый заказ")
-        .navigationBarTitleDisplayMode(.inline)
+#if os(iOS)
+        .toolbar(.hidden, for: .tabBar)
+        .navigationBarTitleDisplayMode(.inline)        
+#endif
         .safeAreaInset(edge: .bottom) {
             OrderSummaryFooterView(
                 total: total,

@@ -265,7 +265,9 @@ struct OrderAddItemSheetView: View {
                             TextField("0", value: $unitPrice, format: .number)
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundStyle(.primary)
+#if os(iOS)
                                 .keyboardType(.numberPad)
+#endif
                         }
                         Spacer()
                     }

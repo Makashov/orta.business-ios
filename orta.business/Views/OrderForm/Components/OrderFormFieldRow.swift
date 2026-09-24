@@ -7,6 +7,39 @@
 
 import SwiftUI
 
+/// Cross-platform stand-in for `UIKeyboardType`, so callers don't need to import UIKit
+/// (which isn't available when this target builds for macOS).
+enum FormKeyboardType {
+    case `default`
+    case numberPad
+    case phonePad
+
+    #if os(iOS)
+    var uiKeyboardType: UIKeyboardType {
+        switch self {
+        case .default: .default
+        case .numberPad: .numberPad
+        case .phonePad: .phonePad
+        }
+    }
+    #endif
+}
+
+/// Cross-platform stand-in for `UITextContentType`.
+enum FormTextContentType {
+    case telephoneNumber
+    case fullStreetAddress
+
+    #if os(iOS)
+    var uiTextContentType: UITextContentType {
+        switch self {
+        case .telephoneNumber: .telephoneNumber
+        case .fullStreetAddress: .fullStreetAddress
+        }
+    }
+    #endif
+}
+
 struct OrderFormFieldRow: View {
     let icon: String
     var iconColor: Color = .secondary
@@ -15,8 +48,8 @@ struct OrderFormFieldRow: View {
     let placeholder: String
     @Binding var text: String
     var valueFont: Font = .system(size: 15, weight: .medium)
-    var keyboardType: UIKeyboardType = .default
-    var textContentType: UITextContentType?
+    var keyboardType: FormKeyboardType = .default
+    var textContentType: FormTextContentType?
     var isMultiline: Bool = false
 
     @FocusState private var isFocused: Bool
@@ -58,8 +91,10 @@ struct OrderFormFieldRow: View {
                     TextField(placeholder, text: $text)
                         .font(valueFont)
                         .foregroundStyle(.primary)
-                        .keyboardType(keyboardType)
-                        .textContentType(textContentType)
+                        #if os(iOS)
+                        .keyboardType(keyboardType.uiKeyboardType)
+                        .textContentType(textContentType?.uiTextContentType)
+                        #endif
                         .focused($isFocused)
                 }
             }

@@ -56,7 +56,9 @@ struct RecentOrdersSectionView: View {
                 }
             }
             .listStyle(.plain)
+            #if os(iOS)
             .listRowSpacing(rowSpacing)
+            #endif
             .scrollDisabled(true)
             .scrollContentBackground(.hidden)
             .frame(height: CGFloat(orders.count) * rowHeight + CGFloat(max(orders.count - 1, 0)) * rowSpacing)

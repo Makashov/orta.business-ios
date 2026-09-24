@@ -7,11 +7,18 @@
 
 import SwiftUI
 
+/// Shown only when the order's address has coordinates — see `OrderDetailsView`, which
+/// hides this whole card otherwise (an address typed by hand has no coordinates to link out to).
 struct OrderDetailsAddressCardView: View {
     let address: String
     var note: String?
+    let lat: Double
+    let lng: Double
     var onOpenMaps: () -> Void = {}
-    var onOpen2GIS: () -> Void = {}
+
+    @Environment(\.openURL) private var openURL
+
+    private var twoGISURL: URL? { ContactLinks.twoGIS(lat: lat, lng: lng) }
 
     var body: some View {
         OrderDetailsCard {
@@ -37,7 +44,11 @@ struct OrderDetailsAddressCardView: View {
 
                 HStack(spacing: 8) {
                     mapButton("На карте", systemImage: "mappin", tint: .brandAccent, action: onOpenMaps)
-                    mapButton("2ГИС", systemImage: "arrow.triangle.turn.up.right.diamond", tint: Color("TealInk"), action: onOpen2GIS)
+                    if let twoGISURL {
+                        mapButton("2ГИС", systemImage: "arrow.triangle.turn.up.right.diamond", tint: Color("TealInk")) {
+                            openURL(twoGISURL)
+                        }
+                    }
                 }
                 .padding(.top, 11)
             }
@@ -65,7 +76,12 @@ struct OrderDetailsAddressCardView: View {
 }
 
 #Preview {
-    OrderDetailsAddressCardView(address: "мкр. Самал-2, 33, кв. 12", note: "Подъезд 2, код 1244, 5 этаж")
-        .padding()
-        .appBackground()
+    OrderDetailsAddressCardView(
+        address: "мкр. Самал-2, 33, кв. 12",
+        note: "Подъезд 2, код 1244, 5 этаж",
+        lat: 43.222,
+        lng: 76.851
+    )
+    .padding()
+    .appBackground()
 }

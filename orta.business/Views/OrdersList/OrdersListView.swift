@@ -66,7 +66,9 @@ struct OrdersListView: View {
                 }
             }
             .listStyle(.plain)
+#if os(iOS)
             .listRowSpacing(8)
+#endif
             .scrollContentBackground(.hidden)
             .refreshable {
                 await loadOrders()

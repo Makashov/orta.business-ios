@@ -27,7 +27,7 @@ enum OrderDatePreset: String, CaseIterable, Identifiable {
 
     /// Inclusive day range for this preset, anchored to `referenceDate`.
     /// `nil` for either bound means "unbounded" (`.all` and `.custom` are resolved by the caller).
-    func range(referenceDate: Date, calendar: Calendar) -> (from: Date?, to: Date?) {
+    nonisolated func range(referenceDate: Date, calendar: Calendar) -> (from: Date?, to: Date?) {
         let today = calendar.startOfDay(for: referenceDate)
         func addingDays(_ value: Int, to date: Date) -> Date {
             calendar.date(byAdding: .day, value: value, to: date)!

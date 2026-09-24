@@ -64,7 +64,9 @@ struct OrderPaymentSheetView: View {
                     TextField("0", value: $amount, format: .number)
                         .font(.system(size: 26, weight: .bold))
                         .foregroundStyle(.primary)
-                        .keyboardType(.numberPad)
+#if os(iOS)
+                        .keyboardType(.numberPad)                
+#endif
                         .disabled(mode == .full)
 
                     Text("₸")

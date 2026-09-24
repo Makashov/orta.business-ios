@@ -142,8 +142,10 @@ struct OrderEditView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .appBackground()
+#if os(iOS)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarTitleDisplayMode(.inline)
+#endif
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 1) {
@@ -155,6 +157,7 @@ struct OrderEditView: View {
                         .foregroundStyle(.tertiary)
                 }
             }
+#if os(iOS)
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     // More actions (share, delete, etc.) — not specified yet.
@@ -164,6 +167,7 @@ struct OrderEditView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+#endif
         }
         .safeAreaInset(edge: .bottom) {
             OrderSummaryFooterView(total: payable, isSubmitEnabled: isFormValid, submitLabel: "Сохранить") {

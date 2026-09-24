@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 extension View {
     /// Trailing cancel/processing + leading WhatsApp swipe actions shared by every
@@ -35,14 +34,12 @@ extension View {
                 }
             }
             .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                Button {
-                    if let url = ContactLinks.whatsApp(order.phone) {
-                        UIApplication.shared.open(url)
+                if let url = ContactLinks.whatsApp(order.phone) {
+                    Link(destination: url) {
+                        Label("WhatsApp", image: "whatsApp")
                     }
-                } label: {
-                    Label("WhatsApp", image: "whatsApp")
+                    .tint(Color("GreenBase"))
                 }
-                .tint(Color("GreenBase"))
             }
     }
 }

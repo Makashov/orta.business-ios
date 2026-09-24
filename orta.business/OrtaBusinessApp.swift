@@ -17,7 +17,7 @@ import SwiftUI
             .environment(authViewModel)
             .environment(orderStatusStore)
             .preferredColorScheme(isDarkModeOn ? .dark : .light)
-            #if DEBUG
+            #if DEBUG && os(iOS)
             .pulseConsoleOnShake()
             #endif
         }

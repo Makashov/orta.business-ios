@@ -63,6 +63,10 @@ struct OrderDetails {
 
     let order: Order
     let clientOrderCount: Int?
+    /// `nil` when the address has no coordinates (typed by hand rather than picked from
+    /// a Google Places prediction) — hides the 2GIS button.
+    let lat: Double?
+    let lng: Double?
     let deliveryAt: Date?
     let createdAt: Date?
     let discount: Int
@@ -84,6 +88,8 @@ struct OrderDetails {
             number: dto.number
         )
         clientOrderCount = dto.client.orderCount
+        lat = dto.address.lat
+        lng = dto.address.lng
         deliveryAt = dto.deliveryAt.flatMap(Date.init(orderTimestamp:))
         createdAt = Date(orderTimestamp: dto.createdAt)
         discount = dto.discount
@@ -115,7 +121,10 @@ struct OrderDetails {
 extension Date {
     /// Parses either the naive `"yyyy-MM-dd'T'HH:mm"` order timestamps or a full ISO 8601 one
     /// (with seconds/offset), which server-generated fields like `created_at` may use.
-    init?(orderTimestamp string: String) {
+    ///
+    /// `nonisolated` because this is pure formatting logic with no main-actor state, called
+    /// point-free from `flatMap`, whose closure parameter type has no actor isolation.
+    nonisolated init?(orderTimestamp string: String) {
         if let date = DateFormatter.orderTimestamp.date(from: string) {
             self = date
             return

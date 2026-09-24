@@ -246,7 +246,8 @@ private struct CreateOrderRequestBody: Encodable {
 
 extension DateFormatter {
     /// Formats/parses the naive `"yyyy-MM-dd'T'HH:mm"` timestamps `scheduled_at`/`delivery_at` use (no seconds, no offset).
-    static let orderTimestamp: DateFormatter = {
+    /// `nonisolated` since this is immutable, thread-safe formatting state with no main-actor ties.
+    nonisolated static let orderTimestamp: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -255,7 +256,7 @@ extension DateFormatter {
     }()
 
     /// Formats the `"YYYY-MM-DD"` dates `GET /orders`' `from`/`till` query params expect.
-    static let orderDateOnly: DateFormatter = {
+    nonisolated static let orderDateOnly: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")

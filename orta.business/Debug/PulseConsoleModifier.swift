@@ -5,7 +5,7 @@
 //  Created by Nurbol Makashov on 19.09.2026.
 //
 
-#if DEBUG
+#if DEBUG && os(iOS)
 import SwiftUI
 import PulseUI
 
