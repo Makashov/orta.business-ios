@@ -62,7 +62,7 @@ struct RecentOrdersSectionView: View {
             .frame(height: CGFloat(orders.count) * rowHeight + CGFloat(max(orders.count - 1, 0)) * rowSpacing)
         }
         .navigationDestination(item: $selectedOrder) { order in
-            OrderEditView(order: order)
+            OrderDetailsView(order: order)
         }
         .task {
             await statusStore?.load()

@@ -13,10 +13,10 @@ struct OrderDetailsView: View {
     let order: Order
 
     @Environment(OrderStatusStore.self) private var statusStore: OrderStatusStore?
+    @Environment(\.openURL) private var openURL
 
     @State private var details: OrderDetails?
     @State private var loadError: String?
-    @State private var isMoreSheetPresented = false
     @State private var isEditPresented = false
 
     private let ordersService: any OrdersServicing = LiveOrdersService()
@@ -43,7 +43,9 @@ struct OrderDetailsView: View {
                 OrderDetailsCustomerCardView(
                     name: current.displayName,
                     subtitle: details?.clientOrderCount.map { "Заказов: \($0)" },
-                    phone: current.phone
+                    phone: current.phone,
+                    onCall: { call(current.phone) },
+                    onWhatsApp: { openWhatsApp(current.phone) }
                 )
 
                 OrderDetailsAddressCardView(address: current.address)
@@ -81,13 +83,13 @@ struct OrderDetailsView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    isMoreSheetPresented = true
+                    isEditPresented = true
                 } label: {
-                    Image(systemName: "ellipsis")
+                    Image(systemName: "pencil")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(.secondary)
                 }
-                .accessibilityLabel("Ещё действия")
+                .accessibilityLabel("Редактировать")
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -96,15 +98,24 @@ struct OrderDetailsView: View {
         .navigationDestination(isPresented: $isEditPresented) {
             OrderEditView(order: current)
         }
-        .sheet(isPresented: $isMoreSheetPresented) {
-            OrderDetailsMoreSheetView()
-        }
         .task {
             await loadDetails()
         }
         .refreshable {
             await loadDetails()
         }
+    }
+
+    // MARK: - Contact actions
+
+    private func call(_ phone: String) {
+        guard let url = ContactLinks.tel(phone) else { return }
+        openURL(url)
+    }
+
+    private func openWhatsApp(_ phone: String) {
+        guard let url = ContactLinks.whatsApp(phone) else { return }
+        openURL(url)
     }
 
     // MARK: - Loading
